@@ -1,0 +1,54 @@
+{
+ "name": "Omega Chess",
+ "description": "",
+ "bishopVersion": "1.4.3",
+ "boardSize": "12x12",
+ "pieceTypes": {
+  "P": {
+   "betza": "fmWfceFifmW3",
+   "promoOptions": {
+    "canPromote": true,
+    "canPromoteTo": false
+   },
+   "enPassantable": true,
+   "noSanSymbol": true,
+   "value": 100
+  },
+  "N": {"betza": "N", "value": 300},
+  "B": {"betza": "B", "value": 300},
+  "R": {"betza": "R", "value": 500},
+  "Q": {"betza": "Q", "value": 900},
+  "K": {
+   "betza": "K",
+   "royal": true,
+   "promoOptions": {
+    "canPromote": false,
+    "canPromoteTo": false
+   }
+  },
+  "C": {"betza": "DAW", "value": 400},
+  "W": {"betza": "FC", "value": 400},
+  "*": {
+   "betza": "",
+   "promoOptions": {
+    "canPromote": false,
+    "canPromoteTo": false
+   },
+   "value": 0,
+   "actions": ["bishop.action.immortality"]
+  }
+ },
+ "castlingOptions": {
+  "enabled": true,
+  "kTarget": 8,
+  "qTarget": 4,
+  "fixedRooks": true,
+  "kRook": 9,
+  "qRook": 2,
+  "useRookAsTarget": false
+ },
+ "promotionOptions": "bishop.promo.standard",
+ "materialConditions": {"enabled": false},
+ "startPosition": "w**********w/*crnbqkbnrc*/*pppppppppp*/*10*/*10*/*10*/*10*/*10*/*10*/*PPPPPPPPPP*/*CRNBQKBNRC*/W**********W w - - 0 1",
+ "enPassant": true
+}

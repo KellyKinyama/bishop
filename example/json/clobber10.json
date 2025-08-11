@@ -1,0 +1,16 @@
+{
+ "name": "Clobber10",
+ "description": "",
+ "bishopVersion": "1.4.3",
+ "boardSize": "10x10",
+ "pieceTypes": {"P": {"betza": "cW"}},
+ "castlingOptions": {"enabled": false},
+ "promotionOptions": "bishop.promo.none",
+ "materialConditions": {"enabled": false},
+ "gameEndConditions": {
+  "stalemate": "lose",
+  "elimination": "lose"
+ },
+ "startPosition": "PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP/PpPpPpPpPp/pPpPpPpPpP w - - 0 1",
+ "enPassant": false
+}
