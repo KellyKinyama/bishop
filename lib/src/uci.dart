@@ -98,7 +98,7 @@ class UciEngine {
     isSearching = false;
 
     if (result.hasMove) {
-      stdout.writeln('bestmove ${result.move.toString()}');
+      stdout.writeln('bestmove ${game.toAlgebraic(result.move!)}');
     }
   }
 }
