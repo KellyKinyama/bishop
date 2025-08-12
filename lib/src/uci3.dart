@@ -1,15 +1,20 @@
+// uci.dart
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:bishop/bishop.dart';
-import 'mcts3.dart' as mc;
+import 'gpt_model2.dart';
+import 'mcts5.dart' as mc;
 
 class UciEngine {
   late Game game;
   mc.Mcts? mcts;
   bool isSearching = false;
+  final GptModel gpt;
 
-  UciEngine() {
-    game = Game(); // Initialize a new standard chess game
+  UciEngine(this.gpt) {
+    game = Game();
+    mcts = mc.Mcts(game, gpt.decoder, gpt.stoi, gpt.itos);
   }
 
   void startLoop() {
@@ -35,8 +40,8 @@ class UciEngine {
         stdout.writeln('readyok');
         break;
       case 'ucinewgame':
-        game = Game(); // Reset the game state
-        mcts = mc.Mcts(game);
+        game = Game();
+        mcts = mc.Mcts(game, gpt.decoder, gpt.stoi, gpt.itos);
         break;
       case 'position':
         handlePosition(parts);
@@ -45,13 +50,15 @@ class UciEngine {
         handleGo(parts);
         break;
       case 'stop':
-        // A way to stop the search, e.g., by setting a flag
         isSearching = false;
         break;
       case 'quit':
         exit(0);
+      // New command for training on the current game history
+      case 'train':
+        handleTrain();
+        break;
       default:
-        // Ignore unknown commands
         break;
     }
   }
@@ -70,7 +77,9 @@ class UciEngine {
 
     game = Game(variant: null);
     game.setup(fen: fen);
-    mcts = mc.Mcts(game);
+
+    // Re-initialize the MCTS engine with the updated game object
+    mcts = mc.Mcts(game, gpt.decoder, gpt.stoi, gpt.itos);
 
     if (movesIndex != -1) {
       List<String> moves = parts.sublist(movesIndex + 1);
@@ -83,27 +92,36 @@ class UciEngine {
     }
   }
 
-  void handleGo(List<String> parts)  {
-    // Parse time limits from the command, e.g., 'go movetime 1000'
-    int moveTime = 5000; // Default to 5 seconds
+  void handleGo(List<String> parts) async {
+    int moveTime = 5000;
     int movetimeIndex = parts.indexOf('movetime');
     if (movetimeIndex != -1 && movetimeIndex + 1 < parts.length) {
       moveTime = int.tryParse(parts[movetimeIndex + 1]) ?? 5000;
     }
-
     isSearching = true;
 
-    // Run MCTS with the specified time limit. You may need to modify your Mcts.search method to accept a time limit.
-    mc.EngineResult result = mcts!.monteCarlo(game);
-    isSearching = false;
+    if (mcts != null) {
+      // Pass the time limit to the monteCarlo function
+      mc.EngineResult result = await mcts!.monteCarlo(timeLimit: moveTime);
+      isSearching = false;
 
-    if (result.hasMove) {
-      stdout.writeln('bestmove ${game.toAlgebraic(result.move!)}');
+      if (result.hasMove) {
+        stdout.writeln('bestmove ${game.toAlgebraic(result.move!)}');
+      }
     }
+  }
+
+  Future<void> handleTrain() async {
+    print('Starting training on current game history...');
+    await gpt.trainOnSequence(game.moveHistoryAlgebraic);
+    print('Training complete.');
   }
 }
 
+// --------------------------------------------------------------------------------------------------
+
 void main() {
-  final uciEngine = UciEngine();
+  final gpt = GptModel.create();
+  final uciEngine = UciEngine(gpt);
   uciEngine.startLoop();
 }
